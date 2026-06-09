@@ -1,6 +1,6 @@
-from .events import CameraFrame, PeopleDetection
+from .events import CameraFrame, DetectionCamera
 
 __app__ = [
     'CameraFrame',
-    'PeopleDetection',
+    'DetectionCamera',
 ]

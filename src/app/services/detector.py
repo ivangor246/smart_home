@@ -25,3 +25,6 @@ class Detector:
             verbose=False,
         )
         return len(results[0].boxes)
+
+
+detector = Detector()

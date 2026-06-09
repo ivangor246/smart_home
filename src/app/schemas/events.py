@@ -7,5 +7,5 @@ class CameraFrame(BaseEvent):
     image: str
 
 
-class PeopleDetection(BaseEvent):
+class DetectionCamera(BaseEvent):
     people_count: int = Field(ge=0)
