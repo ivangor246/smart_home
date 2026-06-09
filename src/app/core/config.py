@@ -15,5 +15,9 @@ class Config:
     DETECTOR_MODEL: str = 'yolo26n.pt'
     DETECTOR_CONFIDENCE: float = 0.4
 
+    # ws topics
+    T_CAMERA: str = 'camera'
+    T_BUS: str = 'bus'
+
 
 config = Config()

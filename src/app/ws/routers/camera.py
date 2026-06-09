@@ -1,10 +1,12 @@
-import asyncio
 import base64
+import binascii
 
 import cv2
 import numpy as np
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from pydantic import ValidationError
 
+from app.core import config
 from app.schemas import CameraFrame, DetectionCamera
 from app.services import detector
 from app.ws.manager import manager
@@ -23,22 +25,28 @@ def _decode_image(image_base64: str) -> np.ndarray:
 
 @router.websocket('/camera')
 async def ws_camera(ws: WebSocket):
-    await ws.accept()
+    await manager.connect(config.T_CAMERA, ws)
 
     try:
         while True:
             payload = await ws.receive_json()
-            frame = CameraFrame.model_validate(payload)
 
-            image = _decode_image(frame.image)
-            count = await asyncio.to_thread(detector.count_people, image)
+            try:
+                frame = CameraFrame.model_validate(payload)
+                image = _decode_image(frame.image)
+            except (ValidationError, ValueError, binascii.Error) as exc:
+                await ws.send_json({'error': str(exc)})
+                continue
 
+            count = await detector.count_people(image)
             event = DetectionCamera(
-                event='detection on camera',
+                event=frame.event,
                 timestamp=frame.timestamp,
                 people_count=count,
             )
+            await manager.broadcast(config.T_BUS, event.model_dump(mode='json'))
 
-            await manager.broadcast('bus', event.model_dump(mode='json'))
     except WebSocketDisconnect:
-        return
+        ...
+    finally:
+        manager.disconnect(config.T_CAMERA, ws)

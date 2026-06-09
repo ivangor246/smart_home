@@ -11,12 +11,15 @@ class ConnectionManager:
         await ws.accept()
         self.active[topic].add(ws)
 
-    async def disconnect(self, topic: str, ws: WebSocket):
+    def disconnect(self, topic: str, ws: WebSocket):
         self.active[topic].discard(ws)
 
     async def broadcast(self, topic: str, data: dict):
         for ws in set(self.active[topic]):
-            await ws.send_json(data)
+            try:
+                await ws.send_json(data)
+            except Exception:
+                self.active[topic].discard(ws)
 
 
 manager = ConnectionManager()

@@ -1,6 +1,6 @@
 from .events import CameraFrame, DetectionCamera
 
-__app__ = [
+__all__ = [
     'CameraFrame',
     'DetectionCamera',
 ]

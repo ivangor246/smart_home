@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 import numpy as np
@@ -16,8 +17,13 @@ class Detector:
     ):
         self.model = model
         self.confidence = confidence
+        self._lock = asyncio.Lock()
 
-    def count_people(self, image: str | Path | np.ndarray) -> int:
+    async def count_people(self, image: str | Path | np.ndarray) -> int:
+        async with self._lock:
+            return await asyncio.to_thread(self._count_people_sync, image)
+
+    def _count_people_sync(self, image: str | Path | np.ndarray) -> int:
         results = self.model.predict(
             image,
             classes=[PERSON_CLASS_ID],
