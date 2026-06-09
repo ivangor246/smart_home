@@ -12,5 +12,8 @@ class Config:
 
     DEBUG: bool = True
 
+    DETECTOR_MODEL: str = 'yolo26n.pt'
+    DETECTOR_CONFIDENCE: float = 0.4
+
 
 config = Config()
