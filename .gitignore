@@ -176,5 +176,8 @@ psd
 thumb
 sketch
 
+# model weights
+*.pt
+
 saved_data/
 cache_dir/
